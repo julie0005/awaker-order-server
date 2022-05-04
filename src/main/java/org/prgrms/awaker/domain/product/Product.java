@@ -18,63 +18,57 @@ public class Product {
     private final LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    // entity에 있어도 되고, 없어도 되는 필드가 많으면 생성자를 어떻게 생성해야 하나요? - setter 이용?
-
     public Product(UUID productId, UUID categoryId, String productName, long price, Target targetUser){
+        ProductValidator.validateProductName(productName);
+        ProductValidator.validatePrice(price);
+
         this.productId = productId;
         this.categoryId = categoryId;
-
-        ProductValidator.validateProductName(productName);
         this.productName = productName;
-
-        ProductValidator.validatePrice(price);
         this.price = price;
         this.discountedPrice = price;
-
         this.targetUser = targetUser;
-        createdAt = Utils.now();
-        updatedAt = Utils.now();
+        this.createdAt = Utils.now();
+        this.updatedAt = Utils.now();
     }
 
     public Product(UUID productId, UUID categoryId, String productName, long price, Target targetUser, String description){
+        ProductValidator.validateProductName(productName);
+        ProductValidator.validatePrice(price);
+        ProductValidator.validateDescription(description);
+
         this.productId = productId;
         this.categoryId = categoryId;
-
-        ProductValidator.validateProductName(productName);
         this.productName = productName;
-
-        ProductValidator.validatePrice(price);
         this.price = price;
         this.discountedPrice = price;
-
-        ProductValidator.validateDescription(description);
         this.description = description;
         this.targetUser = targetUser;
-        createdAt = Utils.now();
-        updatedAt = Utils.now();
+        this.createdAt = Utils.now();
+        this.updatedAt = Utils.now();
     }
 
     public void setProductName(String productName) {
         ProductValidator.validateProductName(productName);
         this.productName = productName;
+        this.updatedAt = Utils.now();
     }
 
     public void setDescription(String description) {
         ProductValidator.validateDescription(description);
         this.description = description;
+        this.updatedAt = Utils.now();
     }
 
     public void setPrice(long price) {
         ProductValidator.validatePrice(price);
         this.price = price;
+        this.updatedAt = Utils.now();
     }
 
     public void setDiscountedPrice(long discountedPrice) {
         ProductValidator.validateDiscountedPrice(discountedPrice, this.price);
         this.discountedPrice = discountedPrice;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
+        this.updatedAt = Utils.now();
     }
 }
