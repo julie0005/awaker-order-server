@@ -1,11 +1,11 @@
 package org.prgrms.awaker.domain.order;
 
 import lombok.Getter;
-import org.prgrms.awaker.domain.user.UserValidator;
 import org.prgrms.awaker.global.Utils;
 import org.prgrms.awaker.global.enums.OrderStatus;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -14,18 +14,20 @@ public class Order {
     private final UUID userId;
     private final long totalPrice;
     private final long totalDiscount;
+    private final List<OrderItem> orderItems;
     private String address;
     private String postcode;
     private OrderStatus orderStatus;
     private final LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public Order(UUID orderId, UUID userId, long totalPrice, long totalDiscount, String address, String postcode) {
+    public Order(UUID orderId, UUID userId, long totalPrice, long totalDiscount, List<OrderItem> orderItems, String address, String postcode) {
         OrderValidator.validateTotalPrice(totalPrice);
         OrderValidator.validateTotalDiscount(totalDiscount);
         OrderValidator.validateAddress(address);
         OrderValidator.validatePostcode(postcode);
 
+        this.orderItems = orderItems;
         this.orderId = orderId;
         this.userId = userId;
         this.totalPrice = totalPrice;
