@@ -33,7 +33,6 @@ CREATE TABLE users
     postcode VARCHAR(200) DEFAULT NULL,
     password VARCHAR(100) NOT NULL,
     authority VARCHAR(10) NOT NULL,
-    description VARCHAR(500) DEFAULT NULL,
     status VARCHAR(10) NOT NULL DEFAULT 'NONE',
     point int NOT NULL DEFAULT 5000,
     created_at datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),

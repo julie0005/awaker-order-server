@@ -66,6 +66,10 @@ public class Product {
         this.updatedAt = Utils.now();
     }
 
+    public void setTargetUser(Target targetUser) {
+        this.targetUser = targetUser;
+    }
+
     public void setDiscountedPrice(long discountedPrice) {
         ProductValidator.validateDiscountedPrice(discountedPrice, this.price);
         this.discountedPrice = discountedPrice;
