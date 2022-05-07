@@ -85,13 +85,15 @@ class JdbcCategoryRepositoryTest {
 
     @Test
     @Order(4)
-    @DisplayName("상위 카테고리로 하위 카테고리까지 조회할 수 있다.")
+    @DisplayName("상위 카테고리로 하위 카테고리를 조회할 수 있다.")
     void testFindByCategory(){
-        List<Category> categories = categoryRepository.findByParent(rootCategory);
+        List<Category> categories = categoryRepository.findByParentId(rootCategory.getCategoryId());
         assertThat(categories.isEmpty(), is(false));
-        assertThat(categories.size(), is(2));
-        assertThat(categories.get(0), samePropertyValuesAs(rootCategory));
-        assertThat(categories.get(1), samePropertyValuesAs(firstSubCategory));
+        assertThat(categories.size(), is(1));
+        assertThat(categories.get(0), samePropertyValuesAs(firstSubCategory));
+
+        List<Category> categories2 = categoryRepository.findByParentId(firstSubCategory.getCategoryId());
+        assertThat(categories.isEmpty(), is(true));
     }
 
     @Test

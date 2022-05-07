@@ -1,4 +1,7 @@
-package org.prgrms.awaker.domain.product.category;
+package org.prgrms.awaker.domain.product.category.dto;
+
+import org.prgrms.awaker.domain.product.category.Category;
+import org.prgrms.awaker.domain.product.category.CategoryValidator;
 
 import java.util.UUID;
 

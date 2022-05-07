@@ -1,5 +1,6 @@
 package org.prgrms.awaker.domain.product.dto;
 
+import org.prgrms.awaker.domain.product.ProductValidator;
 import org.prgrms.awaker.domain.product.category.Category;
 import org.prgrms.awaker.global.enums.Target;
 
@@ -11,15 +12,20 @@ public record UpdateProductReqDto(@NotNull UUID productId,
                                   @NotBlank String productName,
                                   @NotNull Target targetUser,
                                   String description,
-                                  @NotNull Category category,
+                                  @NotNull UUID categoryId,
                                   long price,
                                   long discountedPrice) {
-    public UpdateProductReqDto(UUID productId, String productName, Target targetUser, String description, Category category, long price, long discountedPrice) {
+    public UpdateProductReqDto(UUID productId, String productName, Target targetUser, String description, UUID categoryId, long price, long discountedPrice) {
+        ProductValidator.validateDescription(description);
+        ProductValidator.validatePrice(price);
+        ProductValidator.validateDescription(description);
+        ProductValidator.validateDiscountedPrice(discountedPrice, price);
+
         this.productId = productId;
         this.productName = productName;
         this.targetUser = targetUser;
         this.description = description;
-        this.category = category;
+        this.categoryId = categoryId;
         this.price = price;
         this.discountedPrice = discountedPrice;
     }

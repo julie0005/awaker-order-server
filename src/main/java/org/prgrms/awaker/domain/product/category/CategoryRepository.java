@@ -1,9 +1,5 @@
 package org.prgrms.awaker.domain.product.category;
 
-import org.prgrms.awaker.domain.product.Product;
-import org.prgrms.awaker.domain.product.dto.ProductResDto;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -16,7 +12,9 @@ public interface CategoryRepository {
 
     Optional<Category> findById(UUID categoryId);
 
-    List<Category> findByParent(Category category);
+    List<Category> findByParentId(UUID categoryId);
+
+    List<Category> findRoots();
 
     void deleteById(UUID categoryId);
 

@@ -7,7 +7,7 @@ import org.prgrms.awaker.domain.product.dto.NewProductReqDto;
 import org.prgrms.awaker.domain.product.dto.UpdateProductReqDto;
 import org.prgrms.awaker.domain.product.repository.ProductRepository;
 import org.prgrms.awaker.global.Utils;
-import org.prgrms.awaker.global.exception.UnknownErrorException;
+import org.prgrms.awaker.global.exception.UnknownException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -43,7 +43,7 @@ public class DefaultProductService implements  ProductService{
     // TODO : Dto, Entity Validation 중복
     @Override
     public Product createProduct(NewProductReqDto productReqDto) {
-        Category productCategory = categoryRepository.findById(productReqDto.categoryId()).orElseThrow(() -> new UnknownErrorException("존재하지 않는 카테고리입니다."));
+        Category productCategory = categoryRepository.findById(productReqDto.categoryId()).orElseThrow(() -> new UnknownException("존재하지 않는 카테고리입니다."));
         Product newProduct = Product.builder()
                 .productId(UUID.randomUUID())
                 .productName(productReqDto.productName())
@@ -60,20 +60,23 @@ public class DefaultProductService implements  ProductService{
 
     @Override
     public Product removeProduct(UUID productId) {
-        Product oldProduct = productRepository.findById(productId).orElseThrow(() -> new UnknownErrorException("존재하지 않는 상품입니다."));
+        Product oldProduct = productRepository.findById(productId).orElseThrow(() -> new UnknownException("존재하지 않는 상품입니다."));
         productRepository.deleteById(productId);
         return oldProduct;
     }
 
     @Override
     public Product updateProduct(UpdateProductReqDto productReqDto) {
-        Product product = productRepository.findById(productReqDto.productId()).orElseThrow(() -> new UnknownErrorException("존재하지 않는 상품입니다."));
+        Product product = productRepository.findById(productReqDto.productId()).orElseThrow(() -> new UnknownException("존재하지 않는 상품입니다."));
+        Category productCategory = categoryRepository.findById(productReqDto.categoryId()).orElseThrow(() -> new UnknownException("존재하지 않는 카테고리입니다."));
+
         product.setProductName(productReqDto.productName());
         product.setDescription(productReqDto.description());
         product.setPrice(productReqDto.price());
         product.setDiscountedPrice(productReqDto.discountedPrice());
         product.setTargetUser(productReqDto.targetUser());
-        product.setCategory(productReqDto.category());
+        product.setCategory(productCategory);
+
         return productRepository.update(product);
     }
 }

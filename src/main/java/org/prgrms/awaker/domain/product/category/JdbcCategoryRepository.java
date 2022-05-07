@@ -1,6 +1,5 @@
 package org.prgrms.awaker.domain.product.category;
 
-import org.prgrms.awaker.domain.product.repository.JdbcProductRepository;
 import org.prgrms.awaker.global.exception.SqlStatementFailException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -92,7 +91,7 @@ public class JdbcCategoryRepository implements CategoryRepository {
     }
 
     @Override
-    public List<Category> findByParent(Category category) {
+    public List<Category> findByParentId(UUID categoryId) {
         return jdbcTemplate.query(
                 """
                         WITH RECURSIVE CTE AS (
@@ -104,11 +103,17 @@ public class JdbcCategoryRepository implements CategoryRepository {
                             FROM category c
                             JOIN CTE b ON c.parent_id = b.category_id
                         )
-                        select * from CTE order by depth;
+                        select * from CTE where category_id != UUID_TO_BIN(:categoryId) order by depth;
                         """,
-                Collections.singletonMap("categoryId", category.getCategoryId().toString().getBytes()), categoryRowMapper
+                Collections.singletonMap("categoryId", categoryId.toString().getBytes()), categoryRowMapper
         );
     }
+
+    @Override
+    public List<Category> findRoots() {
+        return jdbcTemplate.query("select * from category where depth=0", categoryRowMapper);
+    }
+
 
     @Override
     public void deleteById(UUID categoryId) {

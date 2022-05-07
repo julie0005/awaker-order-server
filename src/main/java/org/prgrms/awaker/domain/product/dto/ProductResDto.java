@@ -3,8 +3,7 @@ package org.prgrms.awaker.domain.product.dto;
 import lombok.Builder;
 import org.prgrms.awaker.domain.product.Product;
 import org.prgrms.awaker.domain.product.ProductValidator;
-import org.prgrms.awaker.domain.product.category.Category;
-import org.prgrms.awaker.domain.product.category.CategoryResDto;
+import org.prgrms.awaker.domain.product.category.dto.CategoryResDto;
 import org.prgrms.awaker.global.enums.Target;
 
 import java.time.LocalDateTime;
