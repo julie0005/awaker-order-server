@@ -1,6 +1,7 @@
 package org.prgrms.awaker.domain.product;
 
 import lombok.Getter;
+import org.prgrms.awaker.domain.product.category.Category;
 import org.prgrms.awaker.global.Utils;
 import org.prgrms.awaker.global.enums.Target;
 import java.time.LocalDateTime;
@@ -12,40 +13,27 @@ public class Product {
     private String productName;
     private Target targetUser;
     private String description;
-    private final UUID categoryId;
+    private final Category category;
     private long price;
     private long discountedPrice;
     private final LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public Product(UUID productId, UUID categoryId, String productName, long price, Target targetUser){
+    public Product(UUID productId, Category category, String productName, long price, long discountedPrice, Target targetUser, String description, LocalDateTime createdAt, LocalDateTime updatedAt){
         ProductValidator.validateProductName(productName);
         ProductValidator.validatePrice(price);
+        if(description != null) ProductValidator.validateDescription(description);
+        ProductValidator.validateDiscountedPrice(discountedPrice, price);
 
         this.productId = productId;
-        this.categoryId = categoryId;
+        this.category = category;
         this.productName = productName;
         this.price = price;
-        this.discountedPrice = price;
-        this.targetUser = targetUser;
-        this.createdAt = Utils.now();
-        this.updatedAt = Utils.now();
-    }
-
-    public Product(UUID productId, UUID categoryId, String productName, long price, Target targetUser, String description){
-        ProductValidator.validateProductName(productName);
-        ProductValidator.validatePrice(price);
-        ProductValidator.validateDescription(description);
-
-        this.productId = productId;
-        this.categoryId = categoryId;
-        this.productName = productName;
-        this.price = price;
-        this.discountedPrice = price;
+        this.discountedPrice = discountedPrice;
         this.description = description;
         this.targetUser = targetUser;
-        this.createdAt = Utils.now();
-        this.updatedAt = Utils.now();
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
 
     public void setProductName(String productName) {
