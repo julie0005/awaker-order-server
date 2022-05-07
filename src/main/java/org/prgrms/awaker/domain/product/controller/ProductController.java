@@ -42,12 +42,12 @@ public class ProductController {
     @DeleteMapping("/{productId}")
     public ResponseEntity<ResponseFormat> deleteProduct(@PathVariable UUID productId) {
         Product removedProduct = productService.removeProduct(productId);
-        return ResponseEntity.status(HttpStatus.OK).body(new ResponseFormat(true, HttpStatus.OK.value(), "바우처 삭제 성공 : " + productId, ProductResDto.of(removedProduct)));
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseFormat(true, HttpStatus.OK.value(), "상품 삭제 성공 : " + productId, ProductResDto.of(removedProduct)));
     }
 
     @PutMapping
     public ResponseEntity<ResponseFormat> updateProduct(@RequestBody UpdateProductReqDto reqDto) {
         Product updatedProduct = productService.updateProduct(reqDto);
-        return ResponseEntity.status(HttpStatus.OK).body(new ResponseFormat(true, HttpStatus.OK.value(), "바우처 수정 성공 : ", ProductResDto.of(updatedProduct)));
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseFormat(true, HttpStatus.OK.value(), "상품 수정 성공", ProductResDto.of(updatedProduct)));
     }
 }

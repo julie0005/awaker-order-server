@@ -21,7 +21,7 @@ public class DefaultCategoryService implements CategoryService {
     }
 
     @Override
-    public Optional<Category> getProduct(UUID categoryId) {
+    public Optional<Category> getCategory(UUID categoryId) {
         return categoryRepository.findById(categoryId);
     }
 
@@ -52,6 +52,7 @@ public class DefaultCategoryService implements CategoryService {
         return categoryRepository.insert(newCategory);
     }
 
+    // TODO : Category의 상품들
     @Override
     public Category removeCategory(UUID categoryId) {
         Category oldCategory = categoryRepository.findById(categoryId).orElseThrow(() -> new UnknownException("존재하지 않는 카테고리입니다."));

@@ -8,7 +8,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface CategoryService {
-    Optional<Category> getProduct(UUID categoryId);
+    Optional<Category> getCategory(UUID categoryId);
 
     List<Category> getRootCategories();
 

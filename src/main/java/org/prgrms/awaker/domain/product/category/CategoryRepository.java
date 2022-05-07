@@ -18,6 +18,4 @@ public interface CategoryRepository {
 
     void deleteById(UUID categoryId);
 
-    void deleteAll();
-
 }
