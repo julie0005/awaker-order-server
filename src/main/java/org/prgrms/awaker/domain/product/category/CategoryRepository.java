@@ -18,6 +18,8 @@ public interface CategoryRepository {
 
     List<Category> findByParent(Category category);
 
+    void deleteById(UUID categoryId);
+
     void deleteAll();
 
 }

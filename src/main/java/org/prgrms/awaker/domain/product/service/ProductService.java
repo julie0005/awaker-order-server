@@ -2,16 +2,25 @@ package org.prgrms.awaker.domain.product.service;
 
 import org.prgrms.awaker.domain.product.Product;
 import org.prgrms.awaker.domain.product.category.Category;
+import org.prgrms.awaker.domain.product.dto.NewProductReqDto;
+import org.prgrms.awaker.domain.product.dto.UpdateProductReqDto;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 public interface ProductService {
+
+    Optional<Product> getProduct(UUID productId);
+
     List<Product> getProductsByCategory(Category category);
 
     List<Product> getAllProducts();
 
-    Product createProduct(String productName, Category category, long price);
+    Product createProduct(NewProductReqDto productReqDto);
 
-    Product createProduct(String productName, Category category, long price, String description);
+    Product removeProduct(UUID productId);
+
+    Product updateProduct(UpdateProductReqDto productReqDto);
 }

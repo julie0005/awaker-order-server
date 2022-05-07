@@ -65,13 +65,3 @@ CREATE TABLE order_items
     updated_at datetime(6) DEFAULT NULL,
     INDEX (order_id)
 );
-
-CREATE TABLE carts
-(
-    cart_id BINARY(16) PRIMARY KEY,
-    user_id binary(16)  NOT NULL,
-    product_id  binary(16)  NOT NULL,
-    created_at    datetime(6) NOT NULL,
-    INDEX (user_id),
-    INDEX (product_id)
-);

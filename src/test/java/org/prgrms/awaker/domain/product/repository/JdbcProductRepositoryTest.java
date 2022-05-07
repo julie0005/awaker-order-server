@@ -32,10 +32,32 @@ import static org.hamcrest.Matchers.samePropertyValuesAs;
 class JdbcProductRepositoryTest {
 
     static EmbeddedMysql embeddedMysql;
+    private final Category rootCategory = Category.builder()
+            .categoryId(UUID.randomUUID())
+            .categoryName("상의")
+            .createdAt(Utils.now())
+            .updatedAt(Utils.now())
+            .build();
+    private final Category firstSubCategory = Category.builder()
+            .categoryId(UUID.randomUUID())
+            .categoryName("티셔츠")
+            .parentId(rootCategory.getCategoryId())
+            .createdAt(Utils.now())
+            .updatedAt(Utils.now())
+            .build();
+    private final Product newProduct = Product.builder()
+        .productId(UUID.randomUUID())
+        .category(firstSubCategory)
+        .productName("awaker 반팔티")
+        .price(45000L)
+        .discountedPrice(38000L)
+        .targetUser(Target.UNISEX)
+        .description("")
+        .createdAt(Utils.now())
+        .updatedAt(Utils.now())
+        .build();
 
-    private final Category rootCategory = new Category(UUID.randomUUID(), "상의", Utils.now(), Utils.now());
-    private final Category firstSubCategory = new Category(UUID.randomUUID(), "티셔츠", rootCategory.getCategoryId(), Utils.now(), Utils.now());
-    private final Product newProduct = new Product(UUID.randomUUID(), firstSubCategory, "awaker 반팔티", 45000L, 38000L, Target.UNISEX, "", Utils.now(), Utils.now());
+
 
     @BeforeAll
     void setUp() {

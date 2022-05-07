@@ -1,8 +1,11 @@
 package org.prgrms.awaker.domain.product.category;
 
+import lombok.Builder;
 import lombok.Getter;
 import org.prgrms.awaker.global.Utils;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
@@ -11,12 +14,16 @@ import java.util.UUID;
 // TODO : 생성시간 리팩토링
 // Product 입장에서는 VO, Category 자체의 입장으로는 entity
 public class Category {
+    @NotNull
     private final UUID categoryId;
+    @NotBlank
     private String categoryName;
     private UUID parentId;
+    @NotNull
     private final LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
+    @Builder
     public Category(UUID categoryId, String categoryName, UUID parentId, LocalDateTime createdAt, LocalDateTime updatedAt) {
         CategoryValidator.validateCategoryName(categoryName);
         this.categoryId = categoryId;

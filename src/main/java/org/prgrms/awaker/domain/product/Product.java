@@ -1,28 +1,38 @@
 package org.prgrms.awaker.domain.product;
 
+import lombok.Builder;
 import lombok.Getter;
 import org.prgrms.awaker.domain.product.category.Category;
 import org.prgrms.awaker.global.Utils;
 import org.prgrms.awaker.global.enums.Target;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Getter
 public class Product {
+    @NotNull
     private final UUID productId;
+    @NotBlank
     private String productName;
+    @NotNull
     private Target targetUser;
     private String description;
-    private final Category category;
+    @NotNull
+    private Category category;
     private long price;
     private long discountedPrice;
+    @NotNull
     private final LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
+    @Builder
     public Product(UUID productId, Category category, String productName, long price, long discountedPrice, Target targetUser, String description, LocalDateTime createdAt, LocalDateTime updatedAt){
         ProductValidator.validateProductName(productName);
         ProductValidator.validatePrice(price);
-        if(description != null) ProductValidator.validateDescription(description);
+        ProductValidator.validateDescription(description);
         ProductValidator.validateDiscountedPrice(discountedPrice, price);
 
         this.productId = productId;
@@ -62,5 +72,9 @@ public class Product {
         ProductValidator.validateDiscountedPrice(discountedPrice, this.price);
         this.discountedPrice = discountedPrice;
         this.updatedAt = Utils.now();
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
     }
 }

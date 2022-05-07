@@ -2,6 +2,7 @@ package org.prgrms.awaker.domain.product.repository;
 
 import org.prgrms.awaker.domain.product.Product;
 import org.prgrms.awaker.domain.product.category.Category;
+import org.prgrms.awaker.global.Utils;
 import org.prgrms.awaker.global.enums.Target;
 import org.prgrms.awaker.global.exception.SqlStatementFailException;
 import org.slf4j.Logger;
@@ -51,7 +52,17 @@ public class JdbcProductRepository implements ProductRepository {
 
         Category productCategory = new Category(categoryId, categoryName, parentCategoryId, categoryCreatedAt, categoryUpdatedAt);
 
-        return new Product(productId, productCategory, productName, price, discountedPrice, targetUser, description,  productCreatedAt, productUpdatedAt);
+        return Product.builder()
+                .productId(productId)
+                .productName(productName)
+                .targetUser(targetUser)
+                .description(description)
+                .category(productCategory)
+                .price(price)
+                .discountedPrice(discountedPrice)
+                .createdAt(productCreatedAt)
+                .updatedAt(productUpdatedAt)
+                .build();
     };
 
     private Map<String, Object> toParamMap(Product product) {
@@ -70,7 +81,7 @@ public class JdbcProductRepository implements ProductRepository {
 
     @Override
     public List<Product> findAll() {
-        return jdbcTemplate.query("select * from products p join category c on p.category_id=c.category_id", productRowMapper);
+        return jdbcTemplate.query("select * from products p join category c on p.category_id=c.category_id order by p.created_at desc", productRowMapper);
     }
 
     @Override
@@ -120,6 +131,12 @@ public class JdbcProductRepository implements ProductRepository {
                         """,
                 Collections.singletonMap("categoryId", category.getCategoryId().toString().getBytes()), productRowMapper
         );
+    }
+
+    @Override
+    public void deleteById(UUID productId) {
+        int delete = jdbcTemplate.update("delete from products where product_id = UUID_TO_BIN(:productId)", Collections.singletonMap("productId", productId.toString().getBytes()));
+        if (delete != 1) throw new SqlStatementFailException("정상적으로 삭제되지 않았습니다.");
     }
 
     @Override

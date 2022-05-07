@@ -12,8 +12,7 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDateTime;
 import java.util.*;
 
-import static org.prgrms.awaker.global.Utils.toLocalDateTime;
-import static org.prgrms.awaker.global.Utils.toUUID;
+import static org.prgrms.awaker.global.Utils.*;
 
 @Repository
 public class JdbcCategoryRepository implements CategoryRepository {
@@ -28,14 +27,19 @@ public class JdbcCategoryRepository implements CategoryRepository {
 
     private static final RowMapper<Category> categoryRowMapper = (resultSet, i) -> {
         UUID categoryId = toUUID(resultSet.getBytes("category_id"));
-        UUID parentId = toUUID(resultSet.getBytes("parent_id"));
+        UUID parentId = toNullableUUID(resultSet, "parent_id");
         String categoryName = resultSet.getString("category_name");
         LocalDateTime createdAt = toLocalDateTime(resultSet.getTimestamp("created_at"));
         LocalDateTime updatedAt = toLocalDateTime(resultSet.getTimestamp("updated_at"));
-        return new Category(categoryId, categoryName, parentId, createdAt, updatedAt);
+        return Category.builder()
+                .categoryId(categoryId)
+                .parentId(parentId)
+                .categoryName(categoryName)
+                .createdAt(createdAt)
+                .updatedAt(updatedAt)
+                .build();
     };
 
-    // TODO : parentId null일 수도 있음.
     private Map<String, Object> toParamMap(Category category){
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("categoryId", category.getCategoryId().toString().getBytes());
@@ -67,8 +71,8 @@ public class JdbcCategoryRepository implements CategoryRepository {
 
     @Override
     public Category update(Category category) {
-        int update = jdbcTemplate.update("UPDATE category SET category_name = :categoryName, parent_id = UUID_TO_BIN(:parentId)"
-                        + " WHERE category_id = UUID_TO_BIN(:category_id)",
+        int update = jdbcTemplate.update("UPDATE category SET category_name = :categoryName, parent_id = UUID_TO_BIN(:parentId), updated_at = :updatedAt"
+                        + " WHERE category_id = UUID_TO_BIN(:categoryId)",
                 toParamMap(category));
         if(update!=1) throw new SqlStatementFailException("Nothing was updated");
         return category;
@@ -92,18 +96,37 @@ public class JdbcCategoryRepository implements CategoryRepository {
         return jdbcTemplate.query(
                 """
                         WITH RECURSIVE CTE AS (
-                            SELECT category_id, parent_id, category_name, depth
+                            SELECT category_id, parent_id, category_name, depth, created_at, updated_at
                             FROM category
                             WHERE category_id=UUID_TO_BIN(:categoryId)
                             UNION ALL
-                            SELECT c.category_id, c.parent_id, c.category_name, c.depth
+                            SELECT c.category_id, c.parent_id, c.category_name, c.depth, c.created_at, c.updated_at
                             FROM category c
                             JOIN CTE b ON c.parent_id = b.category_id
                         )
-                        select category_id, category_name, parent_id from CTE order by depth;
+                        select * from CTE order by depth;
                         """,
                 Collections.singletonMap("categoryId", category.getCategoryId().toString().getBytes()), categoryRowMapper
         );
+    }
+
+    @Override
+    public void deleteById(UUID categoryId) {
+        int delete = jdbcTemplate.update(
+                """
+                        WITH RECURSIVE CTE AS (
+                            SELECT category_id, parent_id
+                            FROM category
+                            WHERE category_id=UUID_TO_BIN(:categoryId)
+                            UNION ALL
+                            SELECT c.category_id, c.parent_id
+                            FROM category c
+                            JOIN CTE b ON c.parent_id = b.category_id
+                        )
+                        delete from category where exists (select category_id from CTE where category.category_id=CTE.category_id);
+                        """,
+                 Collections.singletonMap("categoryId", categoryId.toString().getBytes()));
+        if (delete < 0) throw new SqlStatementFailException("정상적으로 삭제되지 않았습니다.");
     }
 
     @Override
