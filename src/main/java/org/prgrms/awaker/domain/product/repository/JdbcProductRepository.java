@@ -2,7 +2,6 @@ package org.prgrms.awaker.domain.product.repository;
 
 import org.prgrms.awaker.domain.product.Product;
 import org.prgrms.awaker.domain.product.category.Category;
-import org.prgrms.awaker.global.Utils;
 import org.prgrms.awaker.global.enums.Target;
 import org.prgrms.awaker.global.exception.SqlStatementFailException;
 import org.slf4j.Logger;
@@ -115,7 +114,7 @@ public class JdbcProductRepository implements ProductRepository {
     }
 
     @Override
-    public List<Product> findByCategory(Category category) {
+    public List<Product> findByCategoryId(UUID categoryId) {
         return jdbcTemplate.query(
                 """
                         WITH RECURSIVE CTE AS (
@@ -129,7 +128,7 @@ public class JdbcProductRepository implements ProductRepository {
                         )
                         select * from products p join category c on p.category_id = c.category_id where exists (SELECT category_id FROM CTE WHERE CTE.category_id = p.category_id)
                         """,
-                Collections.singletonMap("categoryId", category.getCategoryId().toString().getBytes()), productRowMapper
+                Collections.singletonMap("categoryId", categoryId.toString().getBytes()), productRowMapper
         );
     }
 

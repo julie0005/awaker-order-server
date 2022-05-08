@@ -14,7 +14,7 @@ public interface ProductService {
 
     Optional<Product> getProduct(UUID productId);
 
-    List<Product> getProductsByCategory(Category category);
+    List<Product> getProductsByCategory(UUID categoryId);
 
     List<Product> getAllProducts();
 

@@ -1,6 +1,7 @@
 package org.prgrms.awaker.domain.product.controller;
 
 import org.prgrms.awaker.domain.product.Product;
+import org.prgrms.awaker.domain.product.category.Category;
 import org.prgrms.awaker.domain.product.dto.NewProductReqDto;
 import org.prgrms.awaker.domain.product.dto.ProductResDto;
 import org.prgrms.awaker.domain.product.dto.UpdateProductReqDto;
@@ -31,6 +32,13 @@ public class ProductController {
         List<Product> products = productService.getAllProducts();
         List<ProductResDto> productDtos = products.stream().map(ProductResDto::of).toList();
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseFormat(true, HttpStatus.OK.value(), "상품 전체 조회 성공", productDtos));
+    }
+
+    @GetMapping("/{categoryId}")
+    public ResponseEntity<ResponseFormat> getProductsByCategory(@PathVariable UUID categoryId) {
+        List<Product> products = productService.getProductsByCategory(categoryId);
+        List<ProductResDto> productDtos = products.stream().map(ProductResDto::of).toList();
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseFormat(true, HttpStatus.OK.value(), "상품 카테고리별 조회 성공", productDtos));
     }
 
     @PostMapping

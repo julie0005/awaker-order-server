@@ -103,8 +103,8 @@ class JdbcProductRepositoryTest {
     @Order(3)
     @DisplayName("상품을 카테고리로 조회할 수 있다.")
     void testFindByCategory(){
-        List<Product> product = productRepository.findByCategory(firstSubCategory);
-        List<Product> productByParent = productRepository.findByCategory(rootCategory);
+        List<Product> product = productRepository.findByCategoryId(firstSubCategory.getCategoryId());
+        List<Product> productByParent = productRepository.findByCategoryId(rootCategory.getCategoryId());
         assertThat(product.isEmpty(), is(false));
         assertThat(product.get(0).getCategory(), samePropertyValuesAs(firstSubCategory));
         assertThat(productByParent.get(0).getCategory(), samePropertyValuesAs(firstSubCategory));

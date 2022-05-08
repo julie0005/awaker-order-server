@@ -31,8 +31,8 @@ public class DefaultProductService implements  ProductService{
     }
 
     @Override
-    public List<Product> getProductsByCategory(Category category) {
-        return productRepository.findByCategory(category);
+    public List<Product> getProductsByCategory(UUID categoryId) {
+        return productRepository.findByCategoryId(categoryId);
     }
 
     @Override

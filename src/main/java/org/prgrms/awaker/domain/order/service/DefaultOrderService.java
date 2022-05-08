@@ -8,12 +8,15 @@ import org.prgrms.awaker.domain.order.repository.OrderRepository;
 import org.prgrms.awaker.domain.order.repository.OrderSortMethod;
 import org.prgrms.awaker.domain.user.User;
 import org.prgrms.awaker.domain.user.UserRepository;
+import org.prgrms.awaker.global.Utils;
 import org.prgrms.awaker.global.enums.OrderStatus;
 import org.prgrms.awaker.global.exception.UnknownException;
+import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.util.List;
 import java.util.UUID;
 
+@Service
 public class DefaultOrderService implements OrderService{
 
     private final OrderRepository orderRepository;
@@ -25,7 +28,7 @@ public class DefaultOrderService implements OrderService{
     }
 
     @Override
-    public Order createOrder(UUID userId, NewOrderReqDto newOrderReqDto) {
+    public Order createOrder(NewOrderReqDto newOrderReqDto) {
         long totalPrice = newOrderReqDto.orderItems().stream().mapToLong(OrderItem::getProductTotalPrice).sum();
         long totalDiscount = newOrderReqDto.orderItems().stream().mapToLong(OrderItem::getProductTotalDiscount).sum();
         User orderer = userRepository.findById(newOrderReqDto.userId()).orElseThrow(()->new UnknownException("존재하지 않는 사용자입니다."));
@@ -37,30 +40,28 @@ public class DefaultOrderService implements OrderService{
                 .postcode(newOrderReqDto.postcode())
                 .totalPrice(totalPrice)
                 .totalDiscount(totalDiscount)
+                .createdAt(Utils.now())
+                .updatedAt(Utils.now())
                 .build();
         return orderRepository.insert(newOrder);
     }
 
     @Override
-    public Order updateStatus(UUID userId, UUID orderId, OrderStatus orderStatus) {
-        User orderer = userRepository.findById(userId).orElseThrow(()->new UnknownException("존재하지 않는 사용자입니다."));
+    public Order updateStatus(UUID orderId, OrderStatus orderStatus) {
         Order order = orderRepository.findById(orderId).orElseThrow(()->new UnknownException("존재하지 않는 주문입니다."));
         order.setOrderStatus(orderStatus);
         return orderRepository.update(order);
     }
 
     @Override
-    public Order updateAddress(UUID userId, UUID orderId, String address) {
-        User orderer = userRepository.findById(userId).orElseThrow(()->new UnknownException("존재하지 않는 사용자입니다."));
+    public Order updateAddress(UUID orderId, String address) {
         Order order = orderRepository.findById(orderId).orElseThrow(()->new UnknownException("존재하지 않는 주문입니다."));
         order.setAddress(address);
         return orderRepository.update(order);
     }
 
     @Override
-    public Optional<Order> getAllOrders(UUID userId, OrderFilterDto filterDto, OrderSortMethod sortMethod) {
-        User orderer = userRepository.findById(userId).orElseThrow(()->new UnknownException("존재하지 않는 사용자입니다."));
-        orderRepository.findByFilter(filterDto, sortMethod);
-        return Optional.empty();
+    public List<Order> getAllOrders(OrderFilterDto filterDto, OrderSortMethod sortMethod) {
+        return orderRepository.findByFilter(filterDto, sortMethod);
     }
 }

@@ -16,7 +16,7 @@ public interface ProductRepository {
 
     Optional<Product> findById(UUID productId);
 
-    List<Product> findByCategory(Category category);
+    List<Product> findByCategoryId(UUID categoryId);
 
     void deleteById(UUID productId);
 

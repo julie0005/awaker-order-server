@@ -171,6 +171,8 @@ public class JdbcOrderRepository implements OrderRepository {
 
     @Override
     public List<Order> findByFilter(OrderFilterDto filter, OrderSortMethod sortMethod) {
+        if(filter.priceGreaterThan() == null && filter.priceLessThan() == null && filter.before() == null && filter.after() == null)
+            return this.findAll(sortMethod);
         StringBuilder queryBuilder = new StringBuilder("SELECT * FROM orders o join users u on o.user_id = u.user_id WHERE ");
         Map<String, Object> paramMap = new HashMap<>();
         boolean isFirstFilter = true;

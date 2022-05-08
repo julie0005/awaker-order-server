@@ -1,6 +1,5 @@
 package org.prgrms.awaker.domain.user;
 
-import org.prgrms.awaker.domain.user.dto.UserSqlDto;
 import org.prgrms.awaker.global.Utils;
 import org.prgrms.awaker.global.enums.Authority;
 import org.prgrms.awaker.global.enums.Gender;
@@ -27,6 +26,7 @@ public class JdbcUserRepository implements UserRepository {
         Gender gender = Gender.valueOf(resultSet.getString("gender"));
         String address = resultSet.getString("address");
         String postcode = resultSet.getString("postcode");
+        String password = resultSet.getString("password");
         Authority authority = Authority.valueOf(resultSet.getString("authority"));
         int point = resultSet.getInt("point");
         int age = resultSet.getInt("age");
@@ -39,6 +39,7 @@ public class JdbcUserRepository implements UserRepository {
                 .age(age)
                 .auth(authority)
                 .gender(gender)
+                .password(password)
                 .createdAt(createdAt)
                 .updatedAt(updatedAt)
                 .build();
