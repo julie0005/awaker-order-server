@@ -27,7 +27,7 @@ CREATE TABLE users
 (
     user_id BINARY(16) PRIMARY KEY,
     user_name VARCHAR(20) NOT NULL,
-    gender VARCHAR(5) NOT NULL,
+    gender VARCHAR(6) NOT NULL,
     age int NOT NULL,
     email VARCHAR(50) NOT NULL,
     address VARCHAR(200) DEFAULT NULL,

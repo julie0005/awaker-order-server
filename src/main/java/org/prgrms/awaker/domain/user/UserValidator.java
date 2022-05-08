@@ -31,7 +31,7 @@ public class UserValidator {
     }
 
     public static void validatePassword(String password){
-        if(Pattern.matches(Regex.USER_PASSWORD.get(), password)){
+        if(!Pattern.matches(Regex.USER_PASSWORD.get(), password)){
             throw new WrongFormatException("올바르지 않은 비밀번호입니다.");
         }
     }

@@ -1,26 +1,37 @@
 package org.prgrms.awaker.domain.order;
 
+import lombok.Builder;
 import lombok.Getter;
 import org.prgrms.awaker.global.Utils;
 import org.prgrms.awaker.global.enums.OrderStatus;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
 @Getter
 public class Order {
+    @NotNull
     private final UUID orderId;
+    @NotNull
     private final UUID userId;
     private final long totalPrice;
     private final long totalDiscount;
+    @NotEmpty
     private final List<OrderItem> orderItems;
+    @NotNull
     private String address;
+    @NotNull
     private String postcode;
+    @NotNull
     private OrderStatus orderStatus;
+    @NotNull
     private final LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
+    @Builder
     public Order(UUID orderId, UUID userId, long totalPrice, long totalDiscount, List<OrderItem> orderItems, String address, String postcode) {
         OrderValidator.validateTotalPrice(totalPrice);
         OrderValidator.validateTotalDiscount(totalDiscount);
@@ -54,5 +65,9 @@ public class Order {
         OrderValidator.validatePostcode(postcode);
         this.postcode = postcode;
         this.updatedAt = Utils.now();
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }
