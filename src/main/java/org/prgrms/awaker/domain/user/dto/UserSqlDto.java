@@ -3,9 +3,7 @@ package org.prgrms.awaker.domain.user.dto;
 import lombok.Builder;
 import lombok.Getter;
 import org.prgrms.awaker.domain.user.UserValidator;
-import org.prgrms.awaker.global.Utils;
 import org.prgrms.awaker.global.enums.Authority;
-import org.prgrms.awaker.global.enums.Constant;
 import org.prgrms.awaker.global.enums.Gender;
 import org.prgrms.awaker.global.enums.UserStatus;
 
@@ -14,7 +12,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Getter
-public class UserResDto {
+public class UserSqlDto {
     @NotNull
     private final UUID userId;
     @NotNull
@@ -36,7 +34,7 @@ public class UserResDto {
     private LocalDateTime updatedAt;
 
     @Builder
-    public UserResDto(UUID userId, String userName, String address, String postcode, Gender gender, int age, String email, Authority auth, LocalDateTime createdAt, LocalDateTime updatedAt, int point, UserStatus status) {
+    public UserSqlDto(UUID userId, String userName, String address, String postcode, Gender gender, int age, String email, Authority auth, LocalDateTime createdAt, LocalDateTime updatedAt, int point, UserStatus status) {
         UserValidator.validateUserName(userName);
         UserValidator.validateAge(age);
         UserValidator.validateEmail(email);

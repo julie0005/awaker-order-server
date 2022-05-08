@@ -60,9 +60,6 @@ public class JdbcCategoryRepository implements CategoryRepository {
         else{
             sql = "INSERT INTO category(category_id, category_name, parent_id, depth, created_at, updated_at) VALUES(UUID_TO_BIN(:categoryId), :categoryName, UUID_TO_BIN(:parentId), (SELECT tmp.depth FROM category tmp WHERE category_id = UUID_TO_BIN(:parentId))+1,  :createdAt, :updatedAt)";
         }
-        logger.info("Category Insert SQL : {}",sql);
-        logger.info("paramMap : {}", toParamMap(category));
-        logger.info("categoryId : {}", category.getCategoryId());
         int update = jdbcTemplate.update(sql, toParamMap(category));
         if(update!=1) throw new SqlStatementFailException("Nothing was inserted");
         return category;

@@ -3,9 +3,11 @@ package org.prgrms.awaker.domain.order.repository;
 import org.prgrms.awaker.domain.order.Order;
 import org.prgrms.awaker.domain.order.OrderItem;
 import org.prgrms.awaker.domain.order.dto.OrderFilterDto;
-import org.prgrms.awaker.domain.order.dto.OrderResDto;
-import org.prgrms.awaker.domain.product.category.JdbcCategoryRepository;
+import org.prgrms.awaker.domain.user.User;
+import org.prgrms.awaker.global.enums.Authority;
+import org.prgrms.awaker.global.enums.Gender;
 import org.prgrms.awaker.global.enums.OrderStatus;
+import org.prgrms.awaker.global.enums.UserStatus;
 import org.prgrms.awaker.global.exception.SqlStatementFailException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,36 +34,81 @@ public class JdbcOrderRepository implements OrderRepository {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    private static final RowMapper<OrderResDto> orderRowMapper = (resultSet, i) -> {
+    private static final RowMapper<OrderItem> orderItemRowMapper = (resultSet, i) -> {
+        UUID productId = toUUID(resultSet.getBytes("product_id"));
+        long productTotalPrice = resultSet.getLong("product_total_price");
+        long productTotalDiscount = resultSet.getLong("product_total_discount");
+        int quantity = resultSet.getInt("quantity");
+
+        return OrderItem.builder()
+                .productId(productId)
+                .productTotalPrice(productTotalPrice)
+                .productTotalDiscount(productTotalDiscount)
+                .quantity(quantity)
+                .build();
+    };
+
+
+    private final RowMapper<Order> orderRowMapper = (resultSet, i) -> {
         UUID orderId = toUUID(resultSet.getBytes("order_id"));
-        UUID userId = toUUID(resultSet.getBytes("user_id"));
-        String userEmail = resultSet.getString("email");
-        String userName = resultSet.getString("user_name");
-        int totalPrice = resultSet.getInt("total_price");
-        int totalDiscount = resultSet.getInt("total_discount");
+        long totalPrice = resultSet.getLong("total_price");
+        long totalDiscount = resultSet.getLong("total_discount");
         OrderStatus orderStatus = OrderStatus.valueOf(resultSet.getString("order_status"));
         String address = resultSet.getString("o.address");
         String postcode = resultSet.getString("o.postcode");
         LocalDateTime createdAt = toLocalDateTime(resultSet.getTimestamp("o.created_at"));
+        LocalDateTime updatdAt = toLocalDateTime(resultSet.getTimestamp("o.updated_at"));
+        List<OrderItem> orderItems = findOrderItemsByOrderId(orderId);
 
-        return OrderResDto.builder()
-                .orderId(orderId)
+        UUID userId = toUUID(resultSet.getBytes("user_id"));
+        String userEmail = resultSet.getString("email");
+        String userName = resultSet.getString("user_name");
+        String password = resultSet.getString("password");
+        int age = resultSet.getInt("age");
+        UserStatus status = UserStatus.valueOf(resultSet.getString("status"));
+        Gender gender = Gender.valueOf(resultSet.getString("gender"));
+        String userAddress = resultSet.getString("address");
+        String userPostcode = resultSet.getString("postcode");
+        Authority authority = Authority.valueOf(resultSet.getString("authority"));
+        int point = resultSet.getInt("point");
+        LocalDateTime userCreatedAt = toLocalDateTime(resultSet.getTimestamp("u.created_at"));
+        LocalDateTime userUpdatedAt = toLocalDateTime(resultSet.getTimestamp("u.updated_at"));
+
+        User user = User.builder()
                 .userId(userId)
                 .userName(userName)
-                .userEmail(userEmail)
+                .email(userEmail)
+                .age(age)
+                .auth(authority)
+                .gender(gender)
+                .password(password)
+                .createdAt(userCreatedAt)
+                .updatedAt(userUpdatedAt)
+                .build();
+        user.setAddress(userAddress);
+        user.setPoint(point);
+        user.setPostcode(userPostcode);
+        user.setStatus(status);
+
+        Order order = Order.builder()
+                .orderId(orderId)
+                .user(user)
                 .totalPrice(totalPrice)
                 .totalDiscount(totalDiscount)
-                .orderStatus(orderStatus)
                 .address(address)
                 .postcode(postcode)
+                .orderItems(orderItems)
                 .createdAt(createdAt)
+                .updatedAt(updatdAt)
                 .build();
+        order.setOrderStatus(orderStatus);
+        return order;
     };
 
     private Map<String, Object> toOrderParamMap(Order order) {
         var paramMap = new HashMap<String, Object>();
         paramMap.put("orderId", order.getOrderId().toString().getBytes());
-        paramMap.put("userId", order.getUserId().toString().getBytes());
+        paramMap.put("userId", order.getUser().getUserId().toString().getBytes());
         paramMap.put("totalPrice", order.getTotalPrice());
         paramMap.put("totalDiscount", order.getTotalDiscount());
         paramMap.put("address", order.getAddress());
@@ -84,6 +131,10 @@ public class JdbcOrderRepository implements OrderRepository {
         return paramMap;
     }
 
+    private List<OrderItem> findOrderItemsByOrderId(UUID orderId) {
+        return jdbcTemplate.query("select * from order_items where order_id = UUID_TO_BIN(:orderId)",
+                Collections.singletonMap("orderId", orderId.toString().getBytes()), orderItemRowMapper);
+    }
 
     @Override
     public Order insert(Order order) {
@@ -97,7 +148,7 @@ public class JdbcOrderRepository implements OrderRepository {
     }
 
     @Override
-    public Optional<OrderResDto> findById(UUID orderId) {
+    public Optional<Order> findById(UUID orderId) {
         try {
             return Optional.ofNullable(
                     jdbcTemplate.queryForObject("SELECT * FROM orders o join users u on o.user_id = u.user_id WHERE order_id = UUID_TO_BIN(:orderId)",
@@ -110,17 +161,16 @@ public class JdbcOrderRepository implements OrderRepository {
     }
 
     @Override
-    public List<OrderResDto> findAll(OrderSortMethod sortMethod) {
+    public List<Order> findAll(OrderSortMethod sortMethod) {
         if (sortMethod == null) {
             sortMethod = OrderSortMethod.RECENT;
         }
         String sql = "SELECT * FROM orders o join users u on o.user_id = u.user_id order by %s".formatted(sortMethod.getQuery());
-        logger.info("find all query : {}", sql);
         return jdbcTemplate.query(sql, orderRowMapper);
     }
 
     @Override
-    public List<OrderResDto> findByFilter(OrderFilterDto filter, OrderSortMethod sortMethod) {
+    public List<Order> findByFilter(OrderFilterDto filter, OrderSortMethod sortMethod) {
         StringBuilder queryBuilder = new StringBuilder("SELECT * FROM orders o join users u on o.user_id = u.user_id WHERE ");
         Map<String, Object> paramMap = new HashMap<>();
         boolean isFirstFilter = true;
@@ -152,7 +202,7 @@ public class JdbcOrderRepository implements OrderRepository {
             queryBuilder.append("created_at <= str_to_date(:before, \"%Y-%m-%d\") ");
             paramMap.put("after", filter.before().toString());
         }
-        logger.info("sql : {}",queryBuilder.toString());
+        logger.info("sql : {}", queryBuilder.toString());
         return jdbcTemplate.query(queryBuilder.toString(), paramMap, orderRowMapper);
     }
 

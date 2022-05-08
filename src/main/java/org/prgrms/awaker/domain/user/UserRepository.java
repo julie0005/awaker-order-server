@@ -1,6 +1,6 @@
 package org.prgrms.awaker.domain.user;
 
-import org.prgrms.awaker.domain.user.dto.UserResDto;
+import org.prgrms.awaker.domain.user.dto.UserSqlDto;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -8,5 +8,5 @@ import java.util.UUID;
 public interface UserRepository {
     User insert(User order);
 
-    Optional<UserResDto> findById(UUID orderId);
+    Optional<User> findById(UUID orderId);
 }

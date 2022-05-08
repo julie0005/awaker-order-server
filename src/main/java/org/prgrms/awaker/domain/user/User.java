@@ -37,7 +37,7 @@ public class User {
     private LocalDateTime updatedAt;
 
     @Builder
-    public User(UUID userId, String userName, Gender gender, int age, String email, String password, Authority auth) {
+    public User(UUID userId, String userName, Gender gender, int age, String email, String password, Authority auth, LocalDateTime createdAt, LocalDateTime updatedAt) {
         UserValidator.validateUserName(userName);
         UserValidator.validateAge(age);
         UserValidator.validateEmail(email);
@@ -52,8 +52,8 @@ public class User {
         this.auth = auth;
         this.point = Constant.INIT_USER_POINT.getValue();
         this.status = UserStatus.NONE;
-        this.createdAt = Utils.now();
-        this.updatedAt = Utils.now();
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
 
     public void changeUserName(String userName) {
@@ -84,7 +84,7 @@ public class User {
         this.updatedAt = Utils.now();
     }
 
-    public void changeStatus(UserStatus status) {
+    public void setStatus(UserStatus status) {
         this.status = status;
         this.updatedAt = Utils.now();
     }

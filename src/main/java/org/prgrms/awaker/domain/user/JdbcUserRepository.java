@@ -1,6 +1,6 @@
 package org.prgrms.awaker.domain.user;
 
-import org.prgrms.awaker.domain.user.dto.UserResDto;
+import org.prgrms.awaker.domain.user.dto.UserSqlDto;
 import org.prgrms.awaker.global.Utils;
 import org.prgrms.awaker.global.enums.Authority;
 import org.prgrms.awaker.global.enums.Gender;
@@ -17,9 +17,9 @@ import java.util.*;
 import static org.prgrms.awaker.global.Utils.toLocalDateTime;
 
 @Repository
-public class JdbcUserRepository implements UserRepository{
+public class JdbcUserRepository implements UserRepository {
     private final NamedParameterJdbcTemplate jdbcTemplate;
-    private static final RowMapper<UserResDto> userRowMapper = (resultSet, rowNum) -> {
+    private static final RowMapper<User> userRowMapper = (resultSet, rowNum) -> {
         UUID userId = Utils.toUUID(resultSet.getBytes("user_id"));
         String name = resultSet.getString("user_name");
         String email = resultSet.getString("email");
@@ -32,20 +32,21 @@ public class JdbcUserRepository implements UserRepository{
         int age = resultSet.getInt("age");
         LocalDateTime createdAt = toLocalDateTime(resultSet.getTimestamp("created_at"));
         LocalDateTime updatedAt = toLocalDateTime(resultSet.getTimestamp("updated_at"));
-        return UserResDto.builder()
+        User user = User.builder()
                 .userId(userId)
                 .userName(name)
                 .email(email)
                 .age(age)
                 .auth(authority)
-                .address(address)
                 .gender(gender)
-                .postcode(postcode)
-                .point(point)
-                .status(status)
                 .createdAt(createdAt)
                 .updatedAt(updatedAt)
                 .build();
+        user.setAddress(address);
+        user.setPostcode(postcode);
+        user.setPoint(point);
+        user.setStatus(status);
+        return user;
     };
 
     public JdbcUserRepository(NamedParameterJdbcTemplate jdbcTemplate) {
@@ -80,7 +81,7 @@ public class JdbcUserRepository implements UserRepository{
     }
 
     @Override
-    public Optional<UserResDto> findById(UUID userId) {
+    public Optional<User> findById(UUID userId) {
         try {
             return Optional.ofNullable(
                     jdbcTemplate.queryForObject("SELECT * FROM users WHERE user_id = UUID_TO_BIN(:userId)",

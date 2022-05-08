@@ -2,6 +2,7 @@ package org.prgrms.awaker.domain.order;
 
 import lombok.Builder;
 import lombok.Getter;
+import org.prgrms.awaker.domain.user.User;
 import org.prgrms.awaker.global.Utils;
 import org.prgrms.awaker.global.enums.OrderStatus;
 
@@ -16,7 +17,7 @@ public class Order {
     @NotNull
     private final UUID orderId;
     @NotNull
-    private final UUID userId;
+    private final User user;
     private final long totalPrice;
     private final long totalDiscount;
     @NotEmpty
@@ -32,22 +33,22 @@ public class Order {
     private LocalDateTime updatedAt;
 
     @Builder
-    public Order(UUID orderId, UUID userId, long totalPrice, long totalDiscount, List<OrderItem> orderItems, String address, String postcode) {
-        OrderValidator.validateTotalPrice(totalPrice);
+    public Order(UUID orderId, User user, long totalPrice, long totalDiscount, List<OrderItem> orderItems, String address, String postcode, LocalDateTime createdAt, LocalDateTime updatedAt) {
+        OrderValidator.validateTotalPrice(totalPrice, orderItems);
         OrderValidator.validateTotalDiscount(totalDiscount);
         OrderValidator.validateAddress(address);
         OrderValidator.validatePostcode(postcode);
 
         this.orderItems = orderItems;
         this.orderId = orderId;
-        this.userId = userId;
+        this.user = user;
         this.totalPrice = totalPrice;
         this.totalDiscount = totalDiscount;
         this.address = address;
         this.postcode = postcode;
         this.orderStatus = OrderStatus.ACCEPTED;
-        this.createdAt = Utils.now();
-        this.updatedAt = Utils.now();
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
 
     public void setOrderStatus(OrderStatus orderStatus) {
