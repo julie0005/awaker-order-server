@@ -133,9 +133,4 @@ public class JdbcCategoryRepository implements CategoryRepository {
                  Collections.singletonMap("categoryId", categoryId.toString().getBytes()));
         if (delete < 0) throw new SqlStatementFailException("정상적으로 삭제되지 않았습니다.");
     }
-
-    @Override
-    public void deleteAll() {
-        jdbcTemplate.update("DELETE FROM category", Collections.emptyMap());
-    }
 }

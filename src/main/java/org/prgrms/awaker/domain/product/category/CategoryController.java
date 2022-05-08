@@ -2,6 +2,7 @@ package org.prgrms.awaker.domain.product.category;
 
 import org.prgrms.awaker.domain.product.category.dto.CategoryResDto;
 import org.prgrms.awaker.domain.product.category.dto.NewCategoryReqDto;
+import org.prgrms.awaker.domain.product.category.dto.RootCategoryResDto;
 import org.prgrms.awaker.domain.product.category.dto.UpdateCategoryReqDto;
 import org.prgrms.awaker.global.ResponseFormat;
 import org.slf4j.Logger;
@@ -26,12 +27,12 @@ public class CategoryController {
     @GetMapping
     public ResponseEntity<ResponseFormat> getRootCategories() {
         List<Category> categories = categoryService.getRootCategories();
-        List<CategoryResDto> categoryResDtos = categories.stream().map(CategoryResDto::of).toList();
+        List<RootCategoryResDto> categoryResDtos = categories.stream().map(RootCategoryResDto::of).toList();
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseFormat(true, HttpStatus.OK.value(), "최상위 카테고리 조회 성공", categoryResDtos));
     }
 
     @GetMapping("/{categoryId}")
-    public ResponseEntity<ResponseFormat> getRootCategories(@PathVariable UUID categoryId) {
+    public ResponseEntity<ResponseFormat> getChildrenCategories(@PathVariable UUID categoryId) {
         List<Category> children = categoryService.getChildrenCategories(categoryId);
         List<CategoryResDto> categoryResDtos = children.stream().map(CategoryResDto::of).toList();
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseFormat(true, HttpStatus.OK.value(), "하위 카테고리 조회 성공", categoryResDtos));
